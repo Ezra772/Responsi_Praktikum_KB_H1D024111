@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask, render_template, request
 from fuzzy_engine import analyze_fuzzy
 from expert_engine import analyze_expert, get_questions, get_categories
