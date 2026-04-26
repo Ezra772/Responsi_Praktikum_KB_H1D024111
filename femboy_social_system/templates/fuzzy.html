@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Analisis Fuzzy Logic{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card fade-in" style="max-width: 800px; margin: 0 auto;">
+        <h2 style="text-align: center; margin-bottom: 0.5rem;">📊 Fuzzy Logic</h2>
+        <p style="text-align: center; color: var(--text-muted); margin-bottom: 2.5rem;">
+            Geser slider untuk menentukan nilai, terus lihat hasilnya.
+        </p>
+
+        <form action="/fuzzy" method="POST" id="fuzzy-form">
+            <div class="form-group fade-in fade-in-delay-1">
+                <div class="label-flex">
+                    <span>🎬 Paparan Media</span>
+                    <span class="slider-value" id="v-eksposur">5.0</span>
+                </div>
+                <input type="range" name="eksposur_media" id="s-eksposur" min="0" max="10" step="0.1" value="5">
+                <div class="slider-labels"><span>Rendah</span><span>Sedang</span><span>Tinggi</span></div>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Seberapa sering kamu terpapar informasi atau budaya
+                    tentang femboy di media?</p>
+            </div>
+
+            <div class="form-group fade-in fade-in-delay-1">
+                <div class="label-flex">
+                    <span>🌍 Latar Budaya</span>
+                    <span class="slider-value" id="v-budaya">5.0</span>
+                </div>
+                <input type="range" name="latar_budaya" id="s-budaya" min="0" max="10" step="0.1" value="5">
+                <div class="slider-labels"><span>Rendah</span><span>Sedang</span><span>Tinggi</span></div>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Latar belakang budaya kamu mendukung atau kurang
+                    mendukung orang yang punya ekspresi gender beda?</p>
+            </div>
+
+            <div class="form-group fade-in fade-in-delay-2">
+                <div class="label-flex">
+                    <span>👥 Lingkungan Sosial</span>
+                    <span class="slider-value" id="v-lingkungan">5.0</span>
+                </div>
+                <input type="range" name="lingkungan_sosial" id="s-lingkungan" min="0" max="10" step="0.1" value="5">
+                <div class="slider-labels"><span>Rendah</span><span>Sedang</span><span>Tinggi</span></div>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Seberapa toleran lingkungan pertemanan atau tempat
+                    tinggal kamu?</p>
+            </div>
+
+            <div class="form-group fade-in fade-in-delay-3">
+                <div class="label-flex">
+                    <span>💗 Tingkat Empati</span>
+                    <span class="slider-value" id="v-empati">5.0</span>
+                </div>
+                <input type="range" name="tingkat_empati" id="s-empati" min="0" max="10" step="0.1" value="5">
+                <div class="slider-labels"><span>Rendah</span><span>Sedang</span><span>Tinggi</span></div>
+                <p style="font-size: 0.85rem; margin-top: 0.5rem;">Seberapa besar kemampuan kamu berempati terhadap
+                    ekspresi diri dari setiap individu?</p>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <button type="submit" class="btn" id="submit-btn">✨ Mulai Analisis Fuzzy</button>
+            </div>
+            <img src="{{ url_for('static', filename='img/asset/Short post __Anime_Marriage toxin (trailer).jpg') }}"
+                class="img-decor" alt="Decoration">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const sliders = [
+        { slider: 's-eksposur', display: 'v-eksposur' },
+        { slider: 's-budaya', display: 'v-budaya' },
+        { slider: 's-lingkungan', display: 'v-lingkungan' },
+        { slider: 's-empati', display: 'v-empati' }
+    ];
+
+    sliders.forEach(({ slider, display }) => {
+        const s = document.getElementById(slider);
+        const d = document.getElementById(display);
+        function update() {
+            const val = parseFloat(s.value);
+            d.textContent = val.toFixed(1);
+            const pct = (val / 10) * 100;
+            s.style.background = `linear-gradient(90deg, rgba(255,45,149,0.6) 0%, rgba(255,107,193,0.8) ${pct}%, rgba(255,107,193,0.12) ${pct}%)`;
+            if (val < 3.5) {
+                d.style.background = 'linear-gradient(135deg, #ff1744, #ff5252)';
+            } else if (val < 7) {
+                d.style.background = 'linear-gradient(135deg, var(--primary), var(--accent))';
+            } else {
+                d.style.background = 'linear-gradient(135deg, #00c853, #00e676)';
+            }
+        }
+        s.addEventListener('input', update);
+        update();
+    });
+
+    document.getElementById('submit-btn').addEventListener('click', function (e) {
+        const btn = this;
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => { btn.style.transform = ''; }, 200);
+    });
+</script>
+{% endblock %}

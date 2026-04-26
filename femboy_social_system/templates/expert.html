@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Expert System — 30 Pertanyaan{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card fade-in" style="max-width: 750px; margin: 0 auto; min-height: 420px;">
+        <div class="progress-wrapper" id="progress-wrapper">
+            <div class="progress-header">
+                <span id="category-label" class="category-badge">🎬 Media &amp; Paparan Budaya</span>
+                <span id="progress-text">0 / {{ questions|length }}</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <h2 id="title" style="text-align: center; margin-bottom: 2rem; font-size: 1.6rem;">Expert System Analysis</h2>
+
+        <form id="expert-form" action="/expert" method="POST">
+            {% for q in questions %}
+            <div class="q-card {% if loop.first %}active{% endif %}" id="q-{{ loop.index }}" data-qid="{{ q.id }}">
+                <p
+                    style="font-size: 1.25rem; text-align: center; font-weight: 600; color: var(--text); line-height: 1.6; margin-bottom: 2rem;">
+                    {{ q.text }}
+                </p>
+
+                <input type="hidden" name="{{ q.id }}" id="input-{{ q.id }}">
+
+                <div class="options">
+                    <button type="button" class="option-btn" data-answer="ya">✅ YA</button>
+                    <button type="button" class="option-btn" data-answer="tidak">❌ TIDAK</button>
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+            <button type="button" class="btn btn-secondary" id="back-btn" style="visibility: hidden;">← Kembali</button>
+            <div id="question-counter" style="color: var(--text-muted); font-size: 0.9rem; align-self: center;"></div>
+        </div>
+    </div>
+</div>
+<img src="{{ url_for('static', filename='img/asset/download__7_-removebg-preview.png') }}"
+    class="mascot-side mascot-float" alt="Mascot">
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const totalQ = {{ questions|length }};
+        const cats = {{ categories|tojson }};
+        let currentQ = 1;
+        let answered = 0;
+        const answers = {};
+
+        function getCat(idx) {
+            let count = 0;
+            for (const c of cats) {
+                count += c.questions.length;
+                if (idx <= count) return c;
+            }
+            return cats[cats.length - 1];
+        }
+
+        function updateProgress() {
+            const pct = (answered / totalQ) * 100;
+            document.getElementById('progress-fill').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = answered + ' / ' + totalQ;
+
+            const cat = getCat(currentQ);
+            document.getElementById('category-label').textContent = cat.icon + ' ' + cat.name;
+            document.getElementById('question-counter').textContent = 'Pertanyaan ' + currentQ + ' dari ' + totalQ;
+            document.getElementById('back-btn').style.visibility = currentQ > 1 ? 'visible' : 'hidden';
+        }
+
+        function restoreAnswer(qIdx) {
+            const card = document.getElementById('q-' + qIdx);
+            const qId = card.dataset.qid;
+            const saved = answers[qId];
+            card.querySelectorAll('.option-btn').forEach(b => {
+                b.classList.remove('selected-ya', 'selected-tidak');
+                if (saved && b.dataset.answer === saved) {
+                    b.classList.add(saved === 'ya' ? 'selected-ya' : 'selected-tidak');
+                }
+            });
+        }
+
+        function goNext() {
+            const card = document.getElementById('q-' + currentQ);
+            card.classList.remove('active');
+            currentQ++;
+            if (currentQ <= totalQ) {
+                document.getElementById('q-' + currentQ).classList.add('active');
+                restoreAnswer(currentQ);
+                updateProgress();
+            } else {
+                document.getElementById('expert-form').submit();
+            }
+        }
+
+        function goPrev() {
+            if (currentQ <= 1) return;
+            document.getElementById('q-' + currentQ).classList.remove('active');
+            currentQ--;
+            document.getElementById('q-' + currentQ).classList.add('active');
+            restoreAnswer(currentQ);
+            updateProgress();
+        }
+
+        function handleAnswer(btn) {
+            const card = btn.closest('.q-card');
+            const qId = card.dataset.qid;
+            const val = btn.dataset.answer;
+
+            document.getElementById('input-' + qId).value = val;
+
+            card.querySelectorAll('.option-btn').forEach(b =>
+                b.classList.remove('selected-ya', 'selected-tidak')
+            );
+            btn.classList.add(val === 'ya' ? 'selected-ya' : 'selected-tidak');
+
+            if (!answers[qId]) answered++;
+            answers[qId] = val;
+            updateProgress();
+
+            setTimeout(goNext, 350);
+        }
+
+        document.getElementById('expert-form').addEventListener('click', function (e) {
+            const btn = e.target.closest('.option-btn');
+            if (btn) handleAnswer(btn);
+        });
+
+        document.getElementById('back-btn').addEventListener('click', goPrev);
+
+        document.addEventListener('keydown', function (e) {
+            if (currentQ > totalQ) return;
+            const card = document.getElementById('q-' + currentQ);
+            const btns = card.querySelectorAll('.option-btn');
+            if (e.key === 'ArrowLeft' || e.key === '1' || e.key === 'y' || e.key === 'Y') {
+                handleAnswer(btns[0]);
+            } else if (e.key === 'ArrowRight' || e.key === '2' || e.key === 'n' || e.key === 'N') {
+                handleAnswer(btns[1]);
+            } else if (e.key === 'Backspace' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                goPrev();
+            }
+        });
+
+        updateProgress();
+    })();
+</script>
+{% endblock %}

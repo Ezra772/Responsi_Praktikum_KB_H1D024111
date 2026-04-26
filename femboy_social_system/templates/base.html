@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Sistem analisis penerimaan sosial terhadap fenomena femboy menggunakan Fuzzy Logic dan Expert System.">
+    <title>{% block title %}Femboy Social System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <canvas id="particles"></canvas>
+
+    <nav class="navbar">
+        <a href="/" class="logo">FemboyEngine</a>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/fuzzy">Fuzzy Logic</a>
+            <a href="/expert">Expert System</a>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        &copy; 2026 Femboy Social System &mdash; di buat pake Flask.
+    </footer>
+
+    <script>
+        (function () {
+            const canvas = document.getElementById('particles');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h, particles = [];
+            function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * w, y: Math.random() * h,
+                    r: Math.random() * 3 + 1,
+                    dx: (Math.random() - 0.5) * 0.3,
+                    dy: (Math.random() - 0.5) * 0.3,
+                    o: Math.random() * 0.3 + 0.1
+                });
+            }
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 143, 185, ${p.o})`;
+                    ctx.fill();
+                    p.x += p.dx; p.y += p.dy;
+                    if (p.x < 0 || p.x > w) p.dx *= -1;
+                    if (p.y < 0 || p.y > h) p.dy *= -1;
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

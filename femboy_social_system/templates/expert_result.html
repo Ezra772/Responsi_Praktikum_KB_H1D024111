@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Hasil Expert System{% endblock %}
+
+{% block content %}
+<div class="container"
+    style="--profile-color: {{ result.profil.color }}; --profile-color-glow: {{ result.profil.color }}44;">
+    <div class="card result-box fade-in" style="max-width: 850px; margin: 0 auto;">
+        <div class="icon-box" id="profile-icon" style="margin-bottom: 1.5rem;">💡</div>
+        <p class="profile-tag">Profil Kamu</p>
+        <h1 id="profile-label">{{ result.profil.label }}</h1>
+
+        <div class="result-description fade-in fade-in-delay-1">
+            <h4 style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.85rem;">📝 Hasil Analisis:
+            </h4>
+            <p class="desc-text">{{ result.profil.deskripsi }}</p>
+            <h4 style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.85rem;">💡 Saran:</h4>
+            <p class="saran-text" style="margin-bottom: 0;">{{ result.profil.saran }}</p>
+        </div>
+
+        <div class="fade-in fade-in-delay-2" style="margin-top: 2.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.2rem;">⚙️ Rules</h3>
+                <span class="rules-badge">
+                    {{ result.total_fired }} rule{{ 's' if result.total_fired != 1 }} terpicu
+                </span>
+            </div>
+
+            {% if result.fired_rules %}
+            {% for rule in result.fired_rules %}
+            <div class="rule-card" data-color="{{ rule.color }}" data-delay="{{ loop.index }}">
+                <p class="rule-cond">{{ rule.kondisi }}</p>
+                <p class="rule-conclusion" data-color="{{ rule.color }}">→ {{ rule.konklusi }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="fallback-notice">
+                Tidak ada aturan yang terpenuhi. Artinya Kamu
+                <strong>Punya pandangan Unik terhadap femboy</strong> berdasarkan total jawaban.
+            </div>
+            {% endif %}
+        </div>
+
+        <div style="margin-top: 3rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/expert" class="btn btn-secondary">🔄 Tes Ulang</a>
+            <a href="/fuzzy" class="btn">📊 Coba Analisis Fuzzy</a>
+        </div>
+        <img src="{{ url_for('static', filename='img/asset/Short post __Anime_Marriage toxin (trailer).jpg') }}" class="img-decor"
+            style="max-width: 400px; margin: 2rem auto 0; display: block;" alt="Happy">
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const color = getComputedStyle(document.documentElement)
+            .getPropertyValue('--profile-color').trim();
+
+        const icon = document.getElementById('profile-icon');
+        if (icon) {
+            icon.style.background = color;
+            icon.style.boxShadow = '0 8px 30px ' + color + '44';
+        }
+
+        document.querySelectorAll('.profile-tag, .saran-text').forEach(el => {
+            el.style.color = color;
+        });
+
+        const label = document.getElementById('profile-label');
+        if (label) {
+            label.style.transition = 'text-shadow 1.5s ease-in-out';
+            let glow = true;
+            setInterval(() => {
+                label.style.textShadow = glow ? '0 0 30px ' + color + '88' : 'none';
+                glow = !glow;
+            }, 1500);
+        }
+
+        document.querySelectorAll('.rule-card').forEach((card, i) => {
+            const c = card.dataset.color;
+            card.style.borderLeftColor = c;
+            card.style.animation = 'fadeInUp 0.5s ease forwards';
+            card.style.animationDelay = (i * 0.12) + 's';
+            card.style.opacity = '0';
+            const conclusion = card.querySelector('.rule-conclusion');
+            if (conclusion) conclusion.style.color = c;
+        });
+    })();
+</script>
+{% endblock %}

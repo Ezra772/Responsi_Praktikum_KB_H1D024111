@@ -1,0 +1,19 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "femboy_social_system/app.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/static/(.*)",
+            "dest": "femboy_social_system/static/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "femboy_social_system/app.py"
+        }
+    ]
+}

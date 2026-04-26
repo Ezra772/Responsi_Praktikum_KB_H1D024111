@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Hasil Analisis Fuzzy{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --result-color: {{ result.color }};
+    }
+</style>
+
+<div class="container">
+    <div class="card result-box fade-in" style="max-width: 900px; margin: 0 auto;">
+        <div class="icon-box" style="margin-bottom: 1.5rem;">📊</div>
+        <h2>Hasil Analisis Fuzzy</h2>
+        <p>Berdasarkan isian yang kamu berikan, hasilnya adalah:</p>
+
+        <div class="score-display" id="score" data-target="{{ result.nilai }}">0</div>
+        <h3 class="result-label">{{ result.label }}</h3>
+
+        <div class="result-description fade-in fade-in-delay-1">
+            {{ result.deskripsi }}
+        </div>
+
+        <div class="input-summary fade-in fade-in-delay-2">
+            <div class="input-item">
+                <div class="label">🎬 Paparan Media</div>
+                <div class="value">{{ data.eksposur_media }}</div>
+            </div>
+            <div class="input-item">
+                <div class="label">🌍 Latar Budaya</div>
+                <div class="value">{{ data.latar_budaya }}</div>
+            </div>
+            <div class="input-item">
+                <div class="label">👥 Lingkungan Sosial</div>
+                <div class="value">{{ data.lingkungan_sosial }}</div>
+            </div>
+            <div class="input-item">
+                <div class="label">💗 Tingkat Empati</div>
+                <div class="value">{{ data.tingkat_empati }}</div>
+            </div>
+        </div>
+
+        <div class="chart-container fade-in fade-in-delay-3">
+            <h4 style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.95rem;">Visualisasi Fungsi
+                Keanggotaan Output</h4>
+            <img src="data:image/png;base64,{{ result.chart }}" alt="Fuzzy Membership Chart">
+        </div>
+
+        <div style="margin-top: 3rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/fuzzy" class="btn btn-secondary">🔄 Analisis Ulang</a>
+            <a href="/expert" class="btn">🧠 Coba Expert System</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const resultColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--result-color').trim();
+
+        const score = document.getElementById('score');
+        if (score) score.style.color = resultColor;
+
+        const label = document.querySelector('.result-label');
+        if (label) {
+            label.style.color = resultColor;
+            label.style.textTransform = 'uppercase';
+            label.style.letterSpacing = '3px';
+            label.style.fontSize = '1.3rem';
+            label.style.marginBottom = '1rem';
+        }
+
+        if (score) {
+            const target = parseFloat(score.dataset.target);
+            const duration = 1500;
+            const start = performance.now();
+            function animate(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                score.textContent = (target * eased).toFixed(2);
+                if (progress < 1) requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+        }
+    })();
+</script>
+{% endblock %}
