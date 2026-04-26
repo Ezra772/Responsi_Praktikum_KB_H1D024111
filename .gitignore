@@ -1,3 +1,6 @@
+# Python version pin (jangan di-push ke Vercel)
+.python-version
+
 # Virtual environment
 .venv/
 venv/

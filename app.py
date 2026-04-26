@@ -1,5 +1,8 @@
 import sys, os
 
+# Python 3.12+ compatibility: setuptools menyediakan distutils shim
+import setuptools  # noqa: F401 — must import before skfuzzy
+
 # Tambahkan direktori femboy_social_system ke sys.path
 _base = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'femboy_social_system')
 sys.path.insert(0, _base)
